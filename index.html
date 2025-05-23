@@ -15,6 +15,7 @@
       margin: auto;
       user-select: none;
       -webkit-user-select: none;
+      transition: filter 0.3s;
     }
     h2 {
       text-align: center;
@@ -56,12 +57,24 @@
       left: 50%;
       transform: translate(-50%, -50%);
       font-size: 50px;
-      color: green;
       background: white;
       border-radius: 20px;
       padding: 30px 60px;
       box-shadow: 0 0 15px rgba(0,0,0,0.2);
       z-index: 9999;
+      text-align: center;
+    }
+    .blur {
+      filter: blur(4px);
+    }
+    #score-popup.green {
+      color: green;
+    }
+    #score-popup.orange {
+      color: orange;
+    }
+    #score-popup.red {
+      color: red;
     }
   </style>
 </head>
@@ -73,7 +86,11 @@
     <button type="submit">Kumpulkan Jawaban</button>
   </form>
 
-  <div id="score-popup"></div>
+  <div id="score-popup">
+    <div id="score-text"></div>
+    <br>
+    <button onclick="closePopup()">Tutup</button>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -85,7 +102,7 @@
     });
 
     const soalData = [
-  ["Temanmu mengatakan bahwa dia melihat UFO. Kamu berkata:", ["That's boring.", "I don't care.", "Oh my God! Really?", "I already knew.", "That's usual."], "C"],
+      ["Temanmu mengatakan bahwa dia melihat UFO. Kamu berkata:", ["That's boring.", "I don't care.", "Oh my God! Really?", "I already knew.", "That's usual."], "C"],
   ["Temanmu mendapatkan nilai 100 pada tes matematika. Kamu berkata:", ["That's not good.", "I expected that.", "Are you kidding me?", "You always fail.", "Who cares?"], "C"],
   ["'Aku bertemu bintang film kemarin!' Apa yang kamu katakan?", ["You lie.", "What a surprise!", "I hate stars.", "So what?", "Try again."], "B"],
   ["'Aku baru saja menang hadiah!'", ["What a boring news!", "Not again!", "That's amazing!", "You're poor.", "Never mind."], "C"],
@@ -110,7 +127,6 @@
   ["Temanmu pandai bermain gitar. Apa pujian yang tepat?", ["Why do you play that?", "Stop playing, please.", "You play the guitar so well!", "It's too noisy.", "I don't like guitar."], "C"],
   ["Bagaimana memberi pujian kepada teman yang membantu orang lain?", ["Why did you help him?", "That's not your job.", "You are so kind!", "Don't do that again.", "He doesn't need you."], "C"],
   ["Kamu melihat temanmu menang dalam lomba lari. Apa yang bisa kamu katakan?", ["You cheated, didn't you?", "Why did you run?", "You were amazing!", "I ran better.", "That was slow."], "C"]
-
     ];
 
     const container = document.getElementById("questions");
@@ -160,8 +176,21 @@
 
       const finalScore = score * 4;
       const scorePopup = document.getElementById("score-popup");
-      scorePopup.textContent = finalScore;
+      const scoreText = document.getElementById("score-text");
+
+      scorePopup.classList.remove("green", "orange", "red");
+
+      if (finalScore >= 70) {
+        scorePopup.classList.add("green");
+      } else if (finalScore >= 60) {
+        scorePopup.classList.add("orange");
+      } else {
+        scorePopup.classList.add("red");
+      }
+
+      scoreText.textContent = finalScore;
       scorePopup.style.display = "block";
+      document.body.classList.add("blur");
 
       confetti({
         particleCount: 200,
@@ -169,6 +198,11 @@
         origin: { y: 0.6 }
       });
     });
+
+    function closePopup() {
+      document.getElementById("score-popup").style.display = "none";
+      document.body.classList.remove("blur");
+    }
   </script>
 </body>
 </html>
