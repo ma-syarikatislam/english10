@@ -1,29 +1,175 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en" translate="no">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kuis Interaktif</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google" content="notranslate">
+  <title>Latihan Soal Bahasa Inggris</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 15px;
+      background: #f5f5f5;
+      color: #333;
+      max-width: 700px;
+      margin: auto;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    h2 {
+      text-align: center;
+      font-size: 1.5em;
+    }
+    .soal {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px 0;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .options {
+      margin-left: 10px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.95em;
+    }
+    button {
+      display: block;
+      margin: 30px auto;
+      padding: 10px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #score-popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 50px;
+      color: green;
+      background: white;
+      border-radius: 20px;
+      padding: 30px 60px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      z-index: 9999;
+    }
+  </style>
 </head>
-<body>
-  <div class="quiz-container">
-    <form id="quiz-form">
-      <!-- Pertanyaan akan dimuat di sini oleh JavaScript -->
-    </form>
-    <button id="submit-btn">Selesai</button>
-  </div>
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" onpaste="return false">
+  <h2>Latihan Soal Bahasa Inggris</h2>
 
-  <!-- Popup Skor -->
-  <div id="score-popup" class="popup hidden">
-    <div class="popup-content">
-      <span id="score-text"></span>
-    </div>
-  </div>
+  <form id="quizForm">
+    <div id="questions"></div>
+    <button type="submit">Kumpulkan Jawaban</button>
+  </form>
 
-  <!-- Canvas untuk Confetti -->
-  <canvas id="confetti-canvas"></canvas>
+  <div id="score-popup"></div>
 
-  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    document.addEventListener("keydown", function (e) {
+      if (e.ctrlKey && ["c", "v", "x"].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+    });
+
+    const soalData = [
+  ["Temanmu mengatakan bahwa dia melihat UFO. Kamu berkata:", ["That’s boring.", "I don’t care.", "Oh my God! Really?", "I already knew.", "That’s usual."], "C"],
+  ["Temanmu mendapatkan nilai 100 pada tes matematika. Kamu berkata:", ["That’s not good.", "I expected that.", "Are you kidding me?", "You always fail.", "Who cares?"], "C"],
+  ["'Aku bertemu bintang film kemarin!' Apa yang kamu katakan?", ["You lie.", "What a surprise!", "I hate stars.", "So what?", "Try again."], "B"],
+  ["'Aku baru saja menang hadiah!'", ["What a boring news!", "Not again!", "That’s amazing!", "You’re poor.", "Never mind."], "C"],
+  ["'Dia bisa berbicara dalam sepuluh bahasa.'", ["I do too.", "That’s impossible!", "He’s stupid.", "No problem.", "That’s nothing."], "B"],
+  ["Kamu melihat temanmu menyanyi dengan sangat baik. Kamu berkata:", ["You dance bad.", "That’s so usual.", "I’m not surprised.", "Wow! I didn’t know you could sing!", "Stop dancing."], "D"],
+  ["'Dia memasak sendiri saat berusia 7 tahun.'", ["That’s normal.", "What a kid!", "She is boring.", "I do that too.", "Who told you?"], "B"],
+  ["'Dia bisa berlari 100 meter dalam 10 detik!'", ["So slow.", "That’s nothing new.", "I can’t believe it!", "I’m faster.", "Try again."], "C"],
+  ["Kamu mengetahui bahwa temanmu yang pemalu menari dengan sangat baik.", ["You? Dancing? No way!", "So boring.", "Of course you do.", "What a bad voice.", "I sing better."], "A"],
+  ["Kamu melihat seekor kucing membuka pintu.", ["Smart cat!", "Cats can’t do that.", "Did I really see that?", "That’s interesting!", "All of the above."], "E"],
+  ["'Ujiannya sudah selesai.'", ["What a surprise!", "I’m so scared!", "Oh no!", "I’m so relieved!", "That’s annoying."], "D"],
+  ["'Aku menemukan ponselku yang hilang.'", ["I’m surprised", "I hate this.", "That’s terrible.", "I’m angry.", "Thanks God!"], "E"],
+  ["'Kamu sekarang aman.'", ["I’m shocked.", "I feel afraid.", "I’m confused.", "I feel calm now.", "I’m happy for you."], "D"],
+  ["'Badai itu sudah berlalu.'", ["That’s strange.", "Oh no!", "Thank goodness!", "I’m scared.", "Why now?"], "C"],
+  ["'Semua hutangmu terbayar lunas'", ["I failed too.", "That’s awful.", "I don’t care.", "I can finally breathe!", "So sad."], "D"],
+  ["Bagaimana kamu memuji seseorang yang memakai baju bagus?", ["What are you doing?", "Can I help you?", "You look amazing!", "Let’s go!", "Do you want to come?"], "C"],
+  ["Kamu melihat temanmu menggambar dengan sangat indah. Apa yang kamu katakan?", ["That’s a terrible drawing.", "Your drawing is beautiful!", "Can I borrow your pencil?", "What is that?", "You should erase it."], "B"],
+  ["Kamu ingin memberi pujian atas pidato temanmu. Apa yang paling tepat?", ["I don’t understand your speech.", "Your speech was boring.", "You did a great job!", "Can you say it again?", "I was sleeping."], "C"],
+  ["Temanmu memenangkan lomba. Apa pujian yang sesuai?", ["You’re so lucky.", "You shouldn’t have joined.", "Wow! Congratulations!", "I could do better.", "Why did you win?"], "C"],
+  ["Bagaimana kamu memuji temanmu yang menari dengan bagus?", ["You dance terribly.", "That was strange.", "You are such a good dancer!", "Can you stop dancing?", "Is that dancing?"], "C"],
+  ["Temanmu menunjukkan lukisan buatannya. Apa yang bisa kamu katakan?", ["That’s ugly.", "Why did you paint that?", "Your painting is amazing!", "You need to fix this.", "I don’t like it."], "C"],
+  ["Apa yang kamu ucapkan jika temanmu mengaji dengan sangat merdu?", ["Your voice is annoying.", "You should be quiet.", "I like your voice!", "You can't sing.", "That was too loud."], "C"],
+  ["Temanmu pandai bermain gitar. Apa pujian yang tepat?", ["Why do you play that?", "Stop playing, please.", "You play the guitar so well!", "It’s too noisy.", "I don’t like guitar."], "C"],
+  ["Bagaimana memberi pujian kepada teman yang membantu orang lain?", ["Why did you help him?", "That’s not your job.", "You are so kind!", "Don’t do that again.", "He doesn’t need you."], "C"],
+  ["Kamu melihat temanmu menang dalam lomba lari. Apa yang bisa kamu katakan?", ["You cheated, didn’t you?", "Why did you run?", "You were amazing!", "I ran better.", "That was slow."], "C"]
+];
+
+    ];
+
+    const container = document.getElementById("questions");
+
+    soalData.forEach((item, index) => {
+      const [soal, options] = item;
+      const soalDiv = document.createElement("div");
+      soalDiv.className = "soal";
+      soalDiv.innerHTML = `<p>${index + 1}. ${soal}</p>`;
+      const optionsDiv = document.createElement("div");
+      optionsDiv.className = "options";
+      options.forEach((opt, i) => {
+        const id = `q${index}opt${i}`;
+        const radio = `
+          <label>
+            <input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}" id="${id}" />
+            ${String.fromCharCode(65 + i)}. ${opt}
+          </label>
+        `;
+        optionsDiv.innerHTML += radio;
+      });
+      soalDiv.appendChild(optionsDiv);
+      container.appendChild(soalDiv);
+    });
+
+    document.getElementById("quizForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      let score = 0;
+      const total = soalData.length;
+
+      for (let i = 0; i < total; i++) {
+        const radios = document.getElementsByName("q" + i);
+        let answered = false;
+        for (const radio of radios) {
+          if (radio.checked) {
+            answered = true;
+            if (radio.value === soalData[i][2]) {
+              score++;
+            }
+          }
+        }
+        if (!answered) {
+          alert("Soal nomor " + (i + 1) + " belum dijawab!");
+          return;
+        }
+      }
+
+      const finalScore = score * 4;
+      const scorePopup = document.getElementById("score-popup");
+      scorePopup.textContent = finalScore;
+      scorePopup.style.display = "block";
+
+      confetti({
+        particleCount: 200,
+        spread: 90,
+        origin: { y: 0.6 }
+      });
+    });
+  </script>
 </body>
 </html>
