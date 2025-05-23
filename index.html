@@ -16,6 +16,7 @@
       user-select: none;
       -webkit-user-select: none;
       transition: filter 0.3s;
+      position: relative;
     }
     h2 {
       text-align: center;
@@ -50,6 +51,16 @@
     button:hover {
       background-color: #45a049;
     }
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.3);
+      z-index: 9998;
+    }
     #score-popup {
       display: none;
       position: fixed;
@@ -64,9 +75,6 @@
       z-index: 9999;
       text-align: center;
     }
-    .blur {
-      filter: blur(4px);
-    }
     #score-popup.green {
       color: green;
     }
@@ -79,6 +87,8 @@
   </style>
 </head>
 <body oncontextmenu="return false" oncopy="return false" oncut="return false" onpaste="return false">
+  <div id="overlay"></div>
+
   <h2>Latihan Soal Bahasa Inggris</h2>
 
   <form id="quizForm">
@@ -179,7 +189,6 @@
       const scoreText = document.getElementById("score-text");
 
       scorePopup.classList.remove("green", "orange", "red");
-
       if (finalScore >= 70) {
         scorePopup.classList.add("green");
       } else if (finalScore >= 60) {
@@ -189,8 +198,8 @@
       }
 
       scoreText.textContent = finalScore;
+      document.getElementById("overlay").style.display = "block";
       scorePopup.style.display = "block";
-      document.body.classList.add("blur");
 
       confetti({
         particleCount: 200,
@@ -201,7 +210,7 @@
 
     function closePopup() {
       document.getElementById("score-popup").style.display = "none";
-      document.body.classList.remove("blur");
+      document.getElementById("overlay").style.display = "none";
     }
   </script>
 </body>
