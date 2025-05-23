@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuis Interaktif</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="quiz-container">
+    <form id="quiz-form">
+      <!-- Pertanyaan akan dimuat di sini oleh JavaScript -->
+    </form>
+    <button id="submit-btn">Selesai</button>
+  </div>
+
+  <!-- Popup Skor -->
+  <div id="score-popup" class="popup hidden">
+    <div class="popup-content">
+      <span id="score-text"></span>
+    </div>
+  </div>
+
+  <!-- Canvas untuk Confetti -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>
