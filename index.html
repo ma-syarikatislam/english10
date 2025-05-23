@@ -93,14 +93,14 @@
 
   <form id="quizForm">
     <div id="questions"></div>
-    <button type="submit">Cek Skor</button>
+    <button type="submit">Kumpulkan Jawaban</button>
   </form>
 
   <div id="score-popup" class="popup">
     <div><strong>Nilai:</strong></div>
     <div id="score-text" style="font-size: 50px;"></div>
     <br>
-    <button onclick="closePopup()">Tutup</button>
+    <button onclick="location.reload()">Tutup</button>
   </div>
 
   <div id="error-popup" class="popup">
@@ -118,7 +118,7 @@
       }
     });
 
-    const soalData = [
+    let soalData = [
       ["Temanmu mengatakan bahwa dia melihat UFO. Kamu berkata:", ["That's boring.", "I don't care.", "Oh my God! Really?", "I already knew.", "That's usual."], "C"],
   ["Temanmu mendapatkan nilai 100 pada tes matematika. Kamu berkata:", ["That's not good.", "I expected that.", "Are you kidding me?", "You always fail.", "Who cares?"], "C"],
   ["'Aku bertemu bintang film kemarin!' Apa yang kamu katakan?", ["You lie.", "What a surprise!", "I hate stars.", "So what?", "Try again."], "B"],
@@ -146,10 +146,24 @@
   ["Kamu melihat temanmu menang dalam lomba lari. Apa yang bisa kamu katakan?", ["You cheated, didn't you?", "Why did you run?", "You were amazing!", "I ran better.", "That was slow."], "C"]
     ];
 
+    // Shuffle array helper
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    shuffleArray(soalData);
     const container = document.getElementById("questions");
 
     soalData.forEach((item, index) => {
-      const [soal, options] = item;
+      let [soal, options, correct] = item;
+      const originalOptions = [...options];
+      shuffleArray(options);
+      const correctIndex = options.indexOf(originalOptions[correct.charCodeAt(0) - 65]);
+      soalData[index][2] = String.fromCharCode(65 + correctIndex);
+
       const soalDiv = document.createElement("div");
       soalDiv.className = "soal";
       soalDiv.innerHTML = `<p>${index + 1}. ${soal}</p>`;
@@ -160,7 +174,7 @@
         const radio = `
           <label>
             <input type="radio" name="q${index}" value="${String.fromCharCode(65 + i)}" id="${id}" />
-            ${String.fromCharCode(65 + i)}. ${opt}
+            ${opt}
           </label>
         `;
         optionsDiv.innerHTML += radio;
@@ -186,7 +200,7 @@
           }
         }
         if (!answered) {
-          showError("?? Soal nomor " + (i + 1) + " belum dijawab!");
+          showError("Soal nomor " + (i + 1) + " belum dijawab!");
           return;
         }
       }
@@ -215,8 +229,8 @@
       });
     });
 
-    function closePopup() {
-      document.getElementById("score-popup").style.display = "none";
+    function closeError() {
+      document.getElementById("error-popup").style.display = "none";
       document.getElementById("overlay").style.display = "none";
     }
 
@@ -225,11 +239,6 @@
       document.getElementById("error-text").textContent = message;
       document.getElementById("overlay").style.display = "block";
       errorPopup.style.display = "block";
-    }
-
-    function closeError() {
-      document.getElementById("error-popup").style.display = "none";
-      document.getElementById("overlay").style.display = "none";
     }
   </script>
 </body>
